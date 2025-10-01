@@ -1,73 +1,105 @@
-# Welcome to your Lovable project
+# Port-Watchdog-Alert
 
-## Project info
+**Port-Watchdog-Alert** is a Java utility that scans a computer or network device to detect open ports. It analyzes which ports may be risky or unsafe by mapping them to common services and raising alerts accordingly.
 
-**URL**: https://lovable.dev/projects/48fe1034-e382-44ef-a43f-9a3fa13bef3b
+---
 
-## How can I edit this code?
+## Table of Contents
 
-There are several ways of editing your application.
+1. [Project Info](#project-info)  
+2. [Features](#features)  
+3. [Tech Stack](#tech-stack)  
+4. [Architecture & Design](#architecture--design)  
+5. [Getting Started / Setup](#getting-started--setup)  
+6. [Usage Examples](#usage-examples)  
+7. [Configuration](#configuration)  
+8. [Alerting & Risk Analysis](#alerting--risk-analysis)  
+9. [Deployment](#deployment)  
+10. [Limitations & Future Enhancements](#limitations--future-enhancements)  
+11. [Contributing](#contributing)  
+12. [License](#license)  
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/48fe1034-e382-44ef-a43f-9a3fa13bef3b) and start prompting.
+## Project Info
 
-Changes made via Lovable will be committed automatically to this repo.
+| Field | Description |
+|---|---|
+| Repository | Ethical-16 / port-watchdog-alert |
+| Purpose | To automatically scan ports on a machine or device, identify exposed ports, assess risk based on known service mappings, and alert users about potentially unsafe ports. |
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Features
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Scan local or remote devices for open TCP ports  
+- Map open ports to known services (e.g. HTTP, FTP, SSH)  
+- Flag ports as “risky” or “safe” based on service profiles  
+- Output results in a human-readable form (console / report)  
+- Optional alert or notification mechanism  
+- Configurable port ranges, timeouts, and scanning strategies  
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Tech Stack
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Language**: Java  
+- **Networking / Socket APIs**: Java standard library (java.net)  
+- **Build / Dependency Tool**: (e.g. Maven or Gradle)  
+- **Logging**: (e.g. SLF4J, Logback or java.util.logging)  
+- **Configuration**: Properties file, JSON, or YAML (as applicable)  
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## Architecture & Design
 
-**Edit a file directly in GitHub**
+- **Scanner module**  
+  Uses Java sockets to attempt connections on given port ranges, with configurable timeouts and concurrency (thread pool) to speed up scanning.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Service mapping / Risk engine**  
+  Maintains a mapping of common ports to known services (e.g. 22 → SSH, 80 → HTTP). Based on this mapping, assigns a “risk score” or label (e.g., *low*, *medium*, *high*).
 
-**Use GitHub Codespaces**
+- **Alert / Report generator**  
+  Formats results (open ports + risk labels) into a summary report. Optionally, could trigger alerts via email, logs, or integration with monitoring systems.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Configuration / Settings**  
+  Users can specify: target host(s), port range(s), timeout settings, concurrency, risk thresholds, etc.
 
-## What technologies are used for this project?
+- **Modular & Extensible**  
+  Allows future extension (e.g. UDP scans, service fingerprinting, automated remediation suggestions).
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Getting Started / Setup
 
-## How can I deploy this project?
+```bash
+# 1. Clone the repository
+git clone https://github.com/Ethical-16/port-watchdog-alert.git
+cd port-watchdog-alert
 
-Simply open [Lovable](https://lovable.dev/projects/48fe1034-e382-44ef-a43f-9a3fa13bef3b) and click on Share -> Publish.
+# 2. Build (if using Maven)
+mvn clean package
 
-## Can I connect a custom domain to my Lovable project?
+# 3. Run the jar (after building)
+java -jar target/port-watchdog-alert-1.0.0.jar --config config.properties
 
-Yes, you can!
+Sample Output:
+Open ports on 127.0.0.1:
+  • Port 22 (SSH) — Risk: Medium
+  • Port 80 (HTTP) — Risk: Low
+  • Port 3306 (MySQL) — Risk: High
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Summary:
+  Total open ports: 3
+  High-risk ports: 1
+  Medium / Low risk: 2
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+config.properties:
+host=127.0.0.1
+ports=1-1024,3306
+timeout=1000
+threads=50
+risk_threshold_high=8
+risk_threshold_medium=5
+
+
